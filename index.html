@@ -1,4 +1,6 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Australian Bird Call Identifier</title>
@@ -146,11 +148,7 @@ audio.on{display:block}
       <span class="loc-txt" id="locTxt"></span>
     </div>
 
-    <div class="api-row">
-      <span class="api-label">Anthropic API Key</span>
-      <input class="api-input" type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off">
-      <p class="api-hint">Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · Never shared or stored</p>
-    </div>
+
 
     <button class="id-btn" id="idBtn" disabled>
       <i class="ti ti-feather"></i> Analyse with BirdNET + Claude
@@ -203,7 +201,7 @@ const waveEl=$('wave'),idBtn=$('idBtn'),player=$('player');
 const fileIn=$('fileIn'),locBtn=$('locBtn'),locTxt=$('locTxt');
 const resWrap=$('resWrap'),loadCard=$('loadCard'),loadTxt=$('loadTxt');
 const resCard=$('resCard'),statusDot=$('statusDot'),statusTxt=$('statusTxt');
-const apiKeyInput=$('apiKey');
+
 
 async function initAudio(){
   try{
@@ -223,10 +221,10 @@ function setStatus(state,msg){
 }
 
 function checkEnable(){
-  idBtn.disabled=!(audioBlob && apiKeyInput.value.trim().startsWith('sk-'));
+  idBtn.disabled=!audioBlob;
 }
 
-apiKeyInput.addEventListener('input',checkEnable);
+
 
 recBtn.addEventListener('click',async()=>{
   if(!isRec){
@@ -321,7 +319,7 @@ async function analyse(){
   resWrap.classList.add('on');
   loadCard.style.display='block';resCard.style.display='none';
   loadTxt.textContent='Extracting audio features…';
-  const apiKey=apiKeyInput.value.trim();
+  
   let featureDesc='No audio features available.';
   try{
     const f=await extractAudioFeatures(audioBlob);
@@ -347,9 +345,9 @@ Respond ONLY with valid JSON, no markdown:
 If not determinable: {"identified":false,"reason":"string"}
 Only real Australian birds.`;
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{
+    const r=await fetch('/api/identify',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})
     });
     const d=await r.json();
