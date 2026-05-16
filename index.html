@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Manager</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #f5f4f0;
+      color: #1a1a18;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .header {
+      margin-bottom: 2rem;
+    }
+
+    .header p {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888780;
+      margin-bottom: 4px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: normal;
+      color: #1a1a18;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.25rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 0.5px solid #c8c7bf;
+      border-radius: 10px;
+      background: #fff;
+      color: #1a1a18;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #888780;
+    }
+
+    input[type="text"]::placeholder {
+      color: #b4b2a9;
+    }
+
+    button.add-btn {
+      padding: 10px 18px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #1a1a18;
+      color: #f5f4f0;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    button.add-btn:hover { opacity: 0.8; }
+
+    .filters {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 1.25rem;
+    }
+
+    .filters button {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 0.5px solid #c8c7bf;
+      background: transparent;
+      color: #888780;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .filters button.active {
+      background: #1a1a18;
+      color: #f5f4f0;
+      border-color: #1a1a18;
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #fff;
+      border: 0.5px solid #d3d1c7;
+      border-radius: 10px;
+      animation: fadeIn 0.18s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .task-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #1a1a18;
+      flex-shrink: 0;
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 14px;
+      color: #1a1a18;
+      transition: opacity 0.15s;
+    }
+
+    .task-text.done {
+      text-decoration: line-through;
+      opacity: 0.4;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #b4b2a9;
+      font-size: 16px;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      flex-shrink: 0;
+      transition: color 0.15s;
+      font-family: inherit;
+    }
+
+    .delete-btn:hover { color: #1a1a18; }
+
+    .empty {
+      text-align: center;
+      padding: 2.5rem 0;
+      font-size: 13px;
+      color: #b4b2a9;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 0.5px solid #d3d1c7;
+    }
+
+    .footer span {
+      font-size: 12px;
+      color: #888780;
+    }
+
+    .footer button {
+      font-size: 12px;
+      font-family: inherit;
+      background: none;
+      border: none;
+      color: #888780;
+      cursor: pointer;
+      padding: 4px 0;
+      transition: color 0.15s;
+    }
+
+    .footer button:hover { color: #1a1a18; }
+
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a18; color: #f0efe9; }
+      .header h1 { color: #f0efe9; }
+      input[type="text"] { background: #2c2c2a; border-color: #444441; color: #f0efe9; }
+      input[type="text"]:focus { border-color: #888780; }
+      button.add-btn { background: #f0efe9; color: #1a1a18; }
+      .filters button { border-color: #444441; color: #888780; }
+      .filters button.active { background: #f0efe9; color: #1a1a18; border-color: #f0efe9; }
+      .task-item { background: #2c2c2a; border-color: #444441; }
+      .task-text { color: #f0efe9; }
+      .task-item input[type="checkbox"] { accent-color: #f0efe9; }
+      .delete-btn { color: #5f5e5a; }
+      .delete-btn:hover { color: #f0efe9; }
+      .footer { border-color: #444441; }
+      .footer button:hover { color: #f0efe9; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <p>my tasks</p>
+      <h1 id="task-count">0 tasks</h1>
+    </div>
+
+    <div class="input-row">
+      <input type="text" id="task-input" placeholder="Add a new task..." />
+      <button class="add-btn" onclick="addTask()">Add</button>
+    </div>
+
+    <div class="filters">
+      <button class="active" id="f-all" onclick="setFilter('all')">All</button>
+      <button id="f-active" onclick="setFilter('active')">Active</button>
+      <button id="f-done" onclick="setFilter('done')">Done</button>
+    </div>
+
+    <div class="task-list" id="task-list"></div>
+    <div class="empty" id="empty-state" style="display:none;">No tasks here yet.</div>
+
+    <div class="footer" id="footer" style="display:none;">
+      <span id="remaining-label"></span>
+      <button onclick="clearDone()">Clear done</button>
+    </div>
+  </div>
+
+  <script>
+    let tasks = [];
+    let filter = 'all';
+    let nextId = 1;
+
+    function addTask() {
+      const input = document.getElementById('task-input');
+      const text = input.value.trim();
+      if (!text) return;
+      tasks.push({ id: nextId++, text, done: false });
+      input.value = '';
+      render();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      render();
+    }
+
+    function toggleTask(id) {
+      const t = tasks.find(t => t.id === id);
+      if (t) t.done = !t.done;
+      render();
+    }
+
+    function clearDone() {
+      tasks = tasks.filter(t => !t.done);
+      render();
+    }
+
+    function setFilter(f) {
+      filter = f;
+      ['all', 'active', 'done'].forEach(x => {
+        document.getElementById('f-' + x).classList.toggle('active', x === f);
+      });
+      render();
+    }
+
+    function render() {
+      const list = document.getElementById('task-list');
+      const empty = document.getElementById('empty-state');
+      const footer = document.getElementById('footer');
+      const countEl = document.getElementById('task-count');
+      const remaining = document.getElementById('remaining-label');
+
+      const filtered = tasks.filter(t =>
+        filter === 'all' ? true : filter === 'active' ? !t.done : t.done
+      );
+
+      countEl.textContent = tasks.length === 1 ? '1 task' : tasks.length + ' tasks';
+
+      if (filtered.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+        list.innerHTML = filtered.map(t => `
+          <div class="task-item">
+            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" />
+            <span class="task-text ${t.done ? 'done' : ''}">${t.text}</span>
+            <button class="delete-btn" onclick="deleteTask(${t.id})">&#x2715;</button>
+          </div>
+        `).join('');
+      }
+
+      const activeCount = tasks.filter(t => !t.done).length;
+      remaining.textContent = activeCount + ' remaining';
+      footer.style.display = tasks.length > 0 ? 'flex' : 'none';
+    }
+
+    document.getElementById('task-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTask();
+    });
+
+    render();
+  </script>
+</body>
+</html>
